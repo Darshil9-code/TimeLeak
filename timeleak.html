@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TimeLeak</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<style>
+:root{--red:#ff2d2d;--grn:#19ff8a;--dim:#8d8d8d;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:#000}
+*{box-sizing:border-box}
+body{margin:0;background:#000;color:#fff;font:16px/1.4 system-ui,-apple-system,sans-serif;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:480px;margin:0 auto;padding:16px}
+h1,h2,.big{font-family:Anton,Impact,'Arial Narrow',sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:.5px;margin:0}
+.logo{font-family:Anton,Impact,sans-serif;font-size:20px;letter-spacing:3px}.logo b{color:var(--red);font-weight:400}
+.big{font-size:clamp(40px,13vw,64px);line-height:1}
+.red{color:var(--red);text-shadow:0 0 24px rgba(255,45,45,.6)}.grn{color:var(--grn);text-shadow:0 0 24px rgba(25,255,138,.55)}
+.sub{color:var(--dim);font-size:14px}
+.screen{display:none}.screen.on{display:block;animation:in .5s}
+@keyframes in{from{opacity:0;transform:translateY(10px)}}
+.cv{width:100%;margin:14px 0 6px}canvas{display:block;width:100%}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--dim)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+input[type=date],input[type=text],input[type=number],textarea{width:100%;background:#0b0b0b;color:#fff;border:1px solid #333;border-radius:12px;padding:13px;font:inherit;font-size:17px}
+textarea{resize:none;height:84px}
+input:focus,textarea:focus{outline:none;border-color:#fff;box-shadow:0 0 14px rgba(255,255,255,.3)}
+input[type=range]{width:100%;accent-color:var(--red);margin:10px 0}
+.g input[type=range]{accent-color:var(--grn)}
+.btn{display:block;width:100%;border:0;border-radius:14px;padding:16px;margin-top:14px;font:inherit;font-family:Anton,Impact,sans-serif;font-size:20px;letter-spacing:1px;text-transform:uppercase;background:#fff;color:#000;box-shadow:0 0 28px rgba(255,255,255,.35);cursor:pointer}
+.btn.r{background:var(--red);color:#fff;box-shadow:0 0 28px rgba(255,45,45,.55)}
+.btn.g{background:var(--grn);color:#000;box-shadow:0 0 28px rgba(25,255,138,.5)}
+.btn.o{background:transparent;color:#fff;border:1px solid #444;box-shadow:none}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.chip{border:1px solid #333;background:#0b0b0b;color:#ddd;border-radius:99px;padding:8px 13px;font:inherit;font-size:14px;cursor:pointer}
+.chip.on{border-color:#fff;color:#fff;box-shadow:0 0 12px rgba(255,255,255,.35)}
+.card{border:1px solid #222;border-radius:16px;padding:14px;margin-top:14px;background:#070707}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px solid #161616;font-size:15px}
+.row:last-child{border:0}.row b{font-size:18px}
+label{font-size:13px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+.x{background:none;border:0;color:#777;font-size:18px;cursor:pointer}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:rgba(0,0,0,.92);backdrop-filter:blur(10px);border-top:1px solid #222;padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;background:none;border:0;color:#777;padding:14px 4px;font:inherit;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+nav button.on{color:#fff;text-shadow:0 0 10px #fff}
+#intro{position:fixed;inset:0;z-index:100;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;padding-top:calc(20px + env(safe-area-inset-top,0px));padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));overflow:hidden}
+#intro.off{display:none}
+#ic{width:auto;height:38vh;max-width:100%;filter:drop-shadow(0 0 5px rgba(255,255,255,.55))}
+.il{font-family:Anton,Impact,sans-serif;text-transform:uppercase;font-size:clamp(26px,8vw,38px);line-height:1.05;text-align:center;opacity:0;transition:opacity .35s;margin-top:16px;min-height:84px}
+.il.on{opacity:1;transition:opacity 1s}
+#iform{opacity:0;pointer-events:none;transition:opacity .8s;width:100%;max-width:340px}
+#iform.on{opacity:1;pointer-events:auto}
+#pv{position:fixed;inset:0;z-index:110;background:rgba(0,0,0,.95);display:none;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:12px}
+#pv.on{display:flex}
+#pv img{max-height:72vh;max-width:100%;border-radius:12px;box-shadow:0 0 30px rgba(255,255,255,.2)}
+.bar{height:8px;background:#1a1a1a;border-radius:9px;overflow:hidden;margin:8px 0}.bar i{display:block;height:100%;background:var(--grn);box-shadow:0 0 12px var(--grn)}
+.credit{text-align:center;color:var(--dim);font-size:12px;margin-top:28px;padding-bottom:10px;letter-spacing:.5px}
+</style></head><body>
+<div class="wrap">
+
+<section class="screen on" id="s0">
+  <div class="logo">TIME<b>LEAK</b> <span class="sub" style="letter-spacing:0">· India</span></div>
+  <div class="sub" id="streak" style="margin-top:6px"></div>
+  <p class="sub" style="margin:18px 0 6px" id="sampleNote">Sample: age 20. Enter your date of birth.</p>
+  <label for="dob">Date of birth</label>
+  <input type="date" id="dob">
+  <div class="chips" id="lifeChips"></div>
+  <h1 class="big" id="pct" style="margin-top:8px"></h1>
+  <p class="sub" id="pctSub"></p>
+  <div class="cv"><canvas></canvas></div>
+  <div class="legend"><span><i style="background:#fff;box-shadow:0 0 6px #fff"></i>lived</span><span><i style="border:1px solid #888"></i>left</span><span><i style="background:var(--red)"></i>wasted</span><span><i style="background:var(--grn)"></i>reclaimed</span></div>
+  <p class="sub">1 dot = 1 week. The faded dots are beyond your chosen lifespan.</p>
+  <button class="chip" id="replay">↺ Replay intro</button>
+  <button class="btn r" onclick="show(1)">Add a habit</button>
+</section>
+
+<section class="screen" id="s1">
+  <div class="logo">TIME<b>LEAK</b></div>
+  <h2 class="big" style="margin:16px 0 4px">What’s it costing you?</h2>
+  <label for="hn">Habit</label>
+  <input type="text" id="hn" value="Instagram" maxlength="30">
+  <div class="chips" id="presets"></div>
+  <label>Hours per day: <b id="hv" style="color:#fff;font-size:16px">2</b></label>
+  <input type="range" id="hh" min="0.5" max="8" step="0.5" value="2">
+  <button class="btn r" id="calc">Calculate</button>
+  <div class="card" id="res"></div>
+  <div class="cv"><canvas></canvas></div>
+  <div class="legend"><span><i style="background:#fff"></i>lived</span><span><i style="background:var(--red)"></i>eaten by habits</span></div>
+  <div class="card" id="list"></div>
+  <button class="btn g" onclick="show(2)">Reclaim time</button>
+</section>
+
+<section class="screen g" id="s2">
+  <div class="logo">TIME<b>LEAK</b></div>
+  <h2 class="big" style="margin:16px 0 4px">Take it <span class="grn">back</span></h2>
+  <label>Pick a habit to cut</label>
+  <div class="chips" id="pick"></div>
+  <label>Cut per day: <b id="cv" style="color:#fff;font-size:16px">30 min</b></label>
+  <input type="range" id="cut" min="15" max="120" step="15" value="30">
+  <div class="card" id="gain"></div>
+  <div class="cv"><canvas></canvas></div>
+  <div class="legend"><span><i style="background:var(--red)"></i>still wasted</span><span><i style="background:var(--grn)"></i>reclaimed</span></div>
+  <div class="card" id="chk"></div>
+  <div class="card">
+    <h2 style="font-size:24px">Make this week count</h2>
+    <p class="sub" style="margin:6px 0 10px">One thing you’ll do instead:</p>
+    <textarea id="pledge" placeholder="e.g. Call Nani every Sunday. Learn guitar. Run 3 km."></textarea>
+  </div>
+  <button class="btn g" id="share">Share image card</button>
+  <button class="btn o" id="wa">Share text on WhatsApp</button>
+  <p class="sub" id="msg" style="text-align:center;min-height:20px"></p>
+</section>
+
+<footer class="credit">Created by Darshil Manoj Bhojwani</footer>
+</div>
+
+<div id="intro"><canvas id="ic" width="260" height="400"></canvas><div class="il" id="il"></div><div id="iform"><label for="idob">When were you born?</label><input type="date" id="idob"><button class="btn r" id="begin">See my life</button><p class="sub" style="text-align:center;margin:8px 0 0">Leave blank to try sample data.</p></div></div>
+<div id="pv"><img id="pvi" alt="Your TimeLeak card"><p class="sub" style="text-align:center">Press and hold the image to save it, then post it to your WhatsApp status.</p><button class="btn o" id="pvx" style="max-width:300px">Close</button></div>
+<nav><button class="on" data-t="0">● My Life</button><button data-t="1">● Habit Cost</button><button data-t="2">● Reclaim</button></nav>
+
+<script>
+const COLS=52,ROWS=80,N=COLS*ROWS,$=s=>document.querySelector(s);
+const d0=new Date();d0.setFullYear(d0.getFullYear()-20);
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const S={dob:iso(d0),life:80,habits:[{name:'Instagram',hrs:2}],res:0,sel:0,cut:30,sample:true,intro:0,pledge:'',checks:{}};
+try{Object.assign(S,JSON.parse(localStorage.getItem('timeleak')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('timeleak',JSON.stringify(S))}catch(e){}};
+const earnedH=()=>Object.values(S.checks).reduce((a,m)=>a+m/60,0);
+function streak(){let n=0,d=new Date();if(!S.checks[iso(d)])d.setDate(d.getDate()-1);while(S.checks[iso(d)]){n++;d.setDate(d.getDate()-1)}return n}
+const lived=()=>Math.max(0,Math.min(N-2,Math.floor((Date.now()-new Date(S.dob))/6048e5)));
+const rem=()=>Math.max(0,S.life*52-lived());
+const eat=h=>Math.min(rem(),rem()*h/16);          // share of waking hours (16/day)
+const totEat=()=>Math.min(rem(),S.habits.reduce((a,h)=>a+eat(h.hrs),0));
+const back=()=>{const h=S.habits[S.sel];return h?Math.min(eat(h.hrs),rem()*(S.cut/60)/16):0};
+const hoursLeft=h=>rem()*7*h;                     // real hours in remaining life
+const yw=w=>{const y=Math.floor(w/52),k=Math.round(w%52);return y+' yr'+(y==1?'':'s')+', '+k+' wk'+(k==1?'':'s')};
+const inr=n=>n>=1e7?(n/1e7).toFixed(1)+' crore':n>=1e5?(n/1e5).toFixed(1)+' lakh':Math.round(n).toLocaleString('en-IN');
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- glowing dot grid ---------- */
+const cvs=[...document.querySelectorAll('.cv canvas')],MODE=[0,1,2];let sp={},cell=0,dpr=1,t0=0;
+function mk(color,fill){const sz=cell*2.8,c=document.createElement('canvas');c.width=c.height=Math.ceil(sz*dpr);const x=c.getContext('2d');x.scale(dpr,dpr);x.shadowColor=color;x.shadowBlur=cell*1.3;x.fillStyle=x.strokeStyle=color;x.beginPath();x.arc(sz/2,sz/2,cell*.3,0,7);fill?x.fill():(x.lineWidth=Math.max(.8,cell*.1),x.stroke());c._sz=sz;return c}
+function size(){const w=$('#s0 .cv').clientWidth||$('.wrap').clientWidth-32;if(!w)return;dpr=Math.min(devicePixelRatio||1,2);cell=w/COLS;
+ sp={l:mk('#fff',1),f:mk('#777',0),r:mk('#ff2d2d',1),g:mk('#19ff8a',1),n:mk('#fff',1)};
+ cvs.forEach(c=>{c.width=Math.ceil(w*dpr);c.height=Math.ceil(cell*ROWS*dpr);c.style.height=cell*ROWS+'px'})}
+const ease=t=>1-Math.pow(1-Math.min(1,Math.max(0,t)),3);
+function draw(ts){requestAnimationFrame(draw);if(!cell)return;
+ cvs.forEach((c,k)=>{if(!c.offsetParent)return;const x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,c.width,c.height);
+  const L=lived(),life=S.life*52,m=MODE[k],R=m?totEat():0,G=m==2?back():0,E=m==2?Math.floor(earnedH()/112):0,e=(ts-t0)/1700;
+  const rN=m==1?R*ease(e):R,gN=G*ease((ts-t0-500)/1500);
+  const dr=(s,i,a,sc)=>{const z=s._sz*(sc||1);x.globalAlpha=a;x.drawImage(s,(i%COLS+.5)*cell-z/2,(Math.floor(i/COLS)+.5)*cell-z/2,z,z)};
+  for(let i=0;i<N;i++){let s=sp.f,a=i>=life?.25:1;
+   if(i<L)s=sp.l;else if(i==L){dr(sp.n,i,1,1.4+.5*Math.sin(ts/260));continue}
+   else{const j=i-L-1;if(j<rN||j<E)s=(j<gN||j<E)?sp.g:sp.r}
+   dr(s,i,a)}
+  x.globalAlpha=1;
+  if(S.life>72&&k!=0||k==0){const y=72*cell;x.setLineDash([3,4]);x.strokeStyle='#555';x.beginPath();x.moveTo(0,y);x.lineTo(c.width/dpr,y);x.stroke();x.setLineDash([]);x.fillStyle='#888';x.font='10px system-ui';x.textAlign='right';x.fillText('India avg ≈ 72',c.width/dpr-2,y-3)}
+ })}
+const bump=()=>{t0=performance.now()};
+
+/* ---------- screens ---------- */
+function show(n){document.querySelectorAll('.screen').forEach((s,i)=>s.classList.toggle('on',i==n));document.querySelectorAll('nav button').forEach((b,i)=>b.classList.toggle('on',i==n));scrollTo(0,0);render();bump()}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(+b.dataset.t));
+
+function render(){save();
+ $('#dob').value=S.dob;
+ const L=lived(),age=((Date.now()-new Date(S.dob))/315576e5).toFixed(1);
+ $('#sampleNote').textContent=S.sample?'Sample data: age 20. Enter your own date of birth.':'You are '+age+' years old.';
+ $('#pct').innerHTML='<span class="red">'+Math.min(100,Math.round(L/(S.life*52)*100))+'%</span> of your life is gone';
+ $('#pctSub').textContent=L.toLocaleString('en-IN')+' weeks lived. Only '+rem().toLocaleString('en-IN')+' weeks left to '+S.life+'.';
+ $('#lifeChips').innerHTML=[[80,'Count to 80'],[72,'India average (72)']].map(([v,t])=>'<button class="chip'+(S.life==v?' on':'')+'" data-v="'+v+'">'+t+'</button>').join('');
+ document.querySelectorAll('#lifeChips .chip').forEach(b=>b.onclick=()=>{S.life=+b.dataset.v;render();bump()});
+
+ const h=S.habits[S.res],T=totEat();
+ if(h){const w=eat(h.hrs),hrs=hoursLeft(h.hrs),reels=hrs*120;
+  $('#res').innerHTML='<div class="sub">'+esc(h.name)+' · '+h.hrs+' hrs/day will eat</div><div class="big red" style="font-size:clamp(34px,10vw,48px);margin:6px 0 10px">'+yw(w)+'</div><div class="sub">of your waking life.</div>'
+  +'<div class="row"><span>Hours lost</span><b>'+inr(hrs)+' hrs</b></div>'
+  +'<div class="row"><span>= 30-sec Reels watched</span><b>'+inr(reels)+'</b></div>'
+  +'<div class="row"><span>= full IPL seasons (260 hrs)</span><b>'+Math.round(hrs/260).toLocaleString('en-IN')+'</b></div>'
+  +'<div class="row"><span>Value at ₹150/hr</span><b>₹'+inr(hrs*150)+'</b></div>'
+  +(S.habits.length>1?'<div class="row"><span>All habits together</span><b class="red">'+yw(T)+'</b></div>':'')}
+ else $('#res').innerHTML='<span class="sub">Add a habit and press Calculate.</span>';
+ $('#list').innerHTML='<label>Your habits</label>'+(S.habits.length?S.habits.map((x,i)=>'<div class="row"><span>'+esc(x.name)+' · '+x.hrs+'h/day</span><span><b class="red">'+yw(eat(x.hrs))+'</b> <button class="x" data-d="'+i+'">×</button></span></div>').join(''):'<p class="sub">None yet.</p>');
+ document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{S.habits.splice(+b.dataset.d,1);S.res=0;S.sel=0;render();bump()});
+
+ const sh=S.habits[S.sel];
+ $('#pick').innerHTML=S.habits.length?S.habits.map((x,i)=>'<button class="chip'+(i==S.sel?' on':'')+'" data-p="'+i+'">'+esc(x.name)+'</button>').join(''):'<span class="sub">Add a habit first.</span>';
+ document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{S.sel=+b.dataset.p;clampCut();render();bump()});
+ clampCut();$('#cut').max=sh?Math.max(15,sh.hrs*60):120;$('#cut').value=S.cut;$('#cv').textContent=S.cut+' min';
+ if(sh){const w=back(),hrs=rem()*7*S.cut/60;
+  $('#gain').innerHTML='<div class="sub">Cut '+S.cut+' min/day of '+esc(sh.name)+' and get back</div><div class="big grn" style="font-size:clamp(34px,10vw,48px);margin:6px 0 10px">'+yw(w)+'</div>'
+  +'<div class="row"><span>Hours reclaimed</span><b>'+inr(hrs)+' hrs</b></div>'
+  +'<div class="row"><span>= books you could read (6 hrs each)</span><b>'+Math.round(hrs/6).toLocaleString('en-IN')+'</b></div>'
+  +'<div class="row"><span>= Himalayan treks (6 days)</span><b>'+Math.round(hrs/144).toLocaleString('en-IN')+'</b></div>'}
+ else $('#gain').innerHTML='<span class="sub">Add a habit on the Habit Cost screen.</span>';renderChk()}
+function renderChk(){const t=iso(new Date()),done=S.checks[t],eh=earnedH(),st=streak(),dots=Math.floor(eh/112),sh=S.habits[S.sel];
+ $('#chk').innerHTML='<label>Daily check-in</label><div class="big grn" style="font-size:34px;margin:6px 0">'+st+' day streak</div>'
+ +'<div class="row"><span>Reclaimed so far</span><b>'+eh.toFixed(1)+' hrs</b></div><div class="sub" style="margin-top:6px">'+dots+' real green dots earned · next one in '+(112-eh%112).toFixed(1)+' hrs (1 dot = 112 waking hrs)</div><div class="bar"><i style="width:'+(eh%112)/112*100+'%"></i></div>'
+ +(sh?'<button class="btn '+(done?'o':'g')+'" id="ck">'+(done?'✓ Kept today · tap to undo':'I kept my '+S.cut+' min today')+'</button>':'');
+ $('#streak').innerHTML=st?'<span class="grn">'+st+'-day streak</span> · '+dots+' real green dots':'Keep your first 30 minutes to start a streak';
+ const b=$('#ck');if(b)b.onclick=()=>{if(S.checks[t])delete S.checks[t];else S.checks[t]=S.cut;render();bump()}}
+function clampCut(){const sh=S.habits[S.sel];if(sh)S.cut=Math.max(15,Math.min(S.cut,Math.max(15,sh.hrs*60)))}
+
+$('#dob').onchange=e=>{if(e.target.value&&new Date(e.target.value)<new Date()){S.dob=e.target.value;S.sample=false;render();bump()}};
+$('#presets').innerHTML=['Instagram Reels','YouTube Shorts','WhatsApp groups','OTT binge','BGMI / gaming','Cricket scores'].map(t=>'<button class="chip">'+t+'</button>').join('');
+document.querySelectorAll('#presets .chip').forEach(b=>b.onclick=()=>$('#hn').value=b.textContent);
+$('#hh').oninput=e=>$('#hv').textContent=e.target.value;
+$('#calc').onclick=()=>{const n=$('#hn').value.trim()||'Habit',h=parseFloat($('#hh').value);
+ const i=S.habits.findIndex(x=>x.name.toLowerCase()==n.toLowerCase());
+ if(i>=0){S.habits[i].hrs=h;S.res=i}else{S.habits.push({name:n,hrs:h});S.res=S.habits.length-1}
+ S.sel=S.res;render();bump();$('#res').scrollIntoView({behavior:'smooth',block:'center'})};
+$('#cut').oninput=e=>{S.cut=+e.target.value;render();t0=performance.now()-2200};
+
+function shareText(){const h=S.habits[S.sel];if(!h)return'Check how much of your life your habits eat. TimeLeak';
+ const p=$('#pledge').value.trim();
+ return '⏳ '+esc(h.name).replace(/&amp;/g,'&')+' is eating '+yw(eat(h.hrs))+' of my life. I’m cutting '+S.cut+' min a day and taking back '+yw(back())+'.'+(p?'\nThis week I’ll: '+p:'')+'\nHow much are you leaking? '+location.href.split('#')[0]}
+async function shareTextOnly(){const t=shareText();try{if(navigator.share){await navigator.share({title:'TimeLeak',text:t});return}}catch(e){return}
+ try{await navigator.clipboard.writeText(t);$('#msg').textContent='Copied. Paste it anywhere.'}catch(e){$('#msg').textContent=t}};
+$('#wa').onclick=()=>open('https://wa.me/?text='+encodeURIComponent(shareText()),'_blank');
+
+new ResizeObserver(()=>{size()}).observe($('.wrap'));
+size();$('#pledge').value=S.pledge||'';render();bump();requestAnimationFrame(draw);
+let introGo=0;
+function intro(){introGo=1;const c=$('#ic'),x=c.getContext('2d'),T=performance.now(),L=$('#il');
+ L.classList.remove('on');$('#iform').classList.remove('on');
+ [[300,'4,160 weeks.<br>One whole life.'],[3000,'Some are <span class="red">leaking</span> away.<br>Silently.'],[5600,'Where are <span class="red">yours</span> going?']].forEach(([t,h])=>setTimeout(()=>{L.classList.remove('on');setTimeout(()=>{L.innerHTML=h;L.classList.add('on')},350)},t));
+ setTimeout(()=>$('#iform').classList.add('on'),6500);
+ (function f(ts){if(!introGo)return;requestAnimationFrame(f);const e=ts-T,n=Math.floor(4160*Math.min(1,e/2800)),rn=Math.floor(1160*Math.min(1,Math.max(0,(e-3200)/2200))),w=new Path2D(),r=new Path2D();
+  for(let i=0;i<n;i++){const px=(i%52+.5)*5,py=(Math.floor(i/52)+.5)*5,p=(i>=3000&&i<3000+rn)?r:w;p.moveTo(px+1.7,py);p.arc(px,py,1.7,0,7)}
+  x.clearRect(0,0,260,400);x.fillStyle='#fff';x.fill(w);x.fillStyle='#ff2d2d';x.fill(r)})(performance.now())}
+function cardCanvas(){const c=document.createElement('canvas');c.width=1080;c.height=1920;const x=c.getContext('2d'),h=S.habits[S.sel]||S.habits[0],L=lived(),R=totEat(),G=back(),E=Math.floor(earnedH()/112),cl=820/52,X0=130,Y0=440,F='Anton,Impact,sans-serif';
+ x.fillStyle='#000';x.fillRect(0,0,1080,1920);x.textAlign='center';
+ x.font='42px '+F;x.fillStyle='#fff';x.fillText('T I M E L E A K',540,90);
+ x.font='60px '+F;x.fillText(h?h.name.toUpperCase()+' IS EATING':'MY HABITS ARE EATING',540,185);
+ x.font='118px '+F;x.fillStyle='#ff2d2d';x.shadowColor='#ff2d2d';x.shadowBlur=36;x.fillText(yw(h?eat(h.hrs):0),540,310);
+ x.shadowBlur=0;x.font='46px '+F;x.fillStyle='#19ff8a';x.fillText('OF MY LIFE · TAKING BACK '+yw(G).toUpperCase(),540,385);
+ for(let i=0;i<N;i++){const px=X0+(i%52+.5)*cl,py=Y0+(Math.floor(i/52)+.5)*cl,j=i-L-1;let col='#fff',f=1,r=cl*.3;
+  if(i>L){if(j<R||j<E)col=(j<G||j<E)?'#19ff8a':'#ff2d2d';else{col='#666';f=0}}else if(i==L)r=cl*.55;
+  x.globalAlpha=i>=S.life*52?.25:1;x.shadowColor=col;x.shadowBlur=cl*.9;x.fillStyle=x.strokeStyle=col;x.lineWidth=1.2;x.beginPath();x.arc(px,py,r,0,7);f?x.fill():x.stroke()}
+ x.globalAlpha=1;x.shadowBlur=0;x.fillStyle='#fff';
+ const p=(S.pledge||'').trim();
+ if(p){x.font='38px '+F;x.fillText('THIS WEEK I WILL:',540,1768);x.font='34px system-ui,sans-serif';x.fillStyle='#ddd';let ln='';const ls=[];p.split(/\s+/).forEach(w=>{if((ln+' '+w).length>38){ls.push(ln);ln=w}else ln=ln?ln+' '+w:w});ls.push(ln);ls.slice(0,2).forEach((s,k)=>x.fillText(s,540,1815+k*44))}
+ x.fillStyle='#888';x.font='34px '+F;x.fillText('HOW MUCH ARE YOU LEAKING?',540,1890);return c}
+function shareCard(){const c=cardCanvas(),t=shareText();
+ c.toBlob(async b=>{const f=new File([b],'timeleak.png',{type:'image/png'});
+  try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:t});return}}catch(e){if(e&&e.name=='AbortError')return}
+  $('#pvi').src=c.toDataURL('image/png');$('#pv').classList.add('on')},'image/png')}
+$('#share').onclick=shareCard;$('#pvx').onclick=()=>$('#pv').classList.remove('on');
+$('#pledge').oninput=e=>{S.pledge=e.target.value;save()};
+$('#replay').onclick=()=>{$('#intro').classList.remove('off');intro()};
+$('#begin').onclick=()=>{const v=$('#idob').value,d=new Date(v);if(v&&d<new Date()&&d>new Date('1920-01-01')){S.dob=v;S.sample=false}S.intro=1;introGo=0;$('#intro').classList.add('off');show(0)};
+if(S.intro)$('#intro').classList.add('off');else intro();
+</script></body></html>
